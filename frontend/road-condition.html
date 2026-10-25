@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road Condition - Smart Road</title><link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+<nav class="sidebar-nav">
+<a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+<a href="traffic.html" class="nav-item"><span>🚦</span>Traffic Management</a>
+<a href="road-condition.html" class="nav-item active"><span>🛣</span>Road Condition</a>
+<a href="route-management.html" class="nav-item"><span>🗺</span>Route Management</a>
+<a href="accident-reporting.html" class="nav-item"><span>⚠</span>Accident Reporting</a>
+<a href="complaint-feedback.html" class="nav-item"><span>💬</span>Complaint & Feedback</a>
+<a href="emergency-services.html" class="nav-item"><span>🚑</span>Emergency Services</a>
+<a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+</nav></aside>
+
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Road Condition</strong></header>
+<section class="page-hero"><p class="eyebrow">MODULE 3</p><h2>Road Condition</h2><p>Check reported road problems between two areas and submit new road-condition reports.</p></section>
+
+<section class="content-grid">
+<article class="panel">
+<div class="panel-header"><div><p class="eyebrow">ROUTE CHECK</p><h3>Check Road Condition</h3></div></div>
+<form id="conditionForm" class="form-grid">
+<label>From Area<input id="fromArea" placeholder="e.g. Guindy" required></label>
+<label>To Area<input id="toArea" placeholder="e.g. T Nagar" required></label>
+<button class="primary-btn" type="submit">Check Route</button>
+</form>
+<div id="conditionResult" class="result-box muted">Enter the starting and destination areas to check known issues.</div>
+</article>
+
+<article class="panel">
+<div class="panel-header"><div><p class="eyebrow">REPORT</p><h3>Report a Road Issue</h3></div></div>
+<form id="reportForm" class="form-grid">
+<label>Road / Area<input id="reportRoad" required placeholder="Road name or area"></label>
+<label>Issue Type<select id="issueType" required><option value="">Select issue</option><option>Pothole</option><option>Damaged Road</option><option>Waterlogging</option><option>Construction</option><option>Blocked Road</option><option>Other</option></select></label>
+<label>Severity<select id="severity" required><option value="">Select severity</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></label>
+<label>Description<textarea id="description" rows="3" placeholder="Describe the problem"></textarea></label>
+<button class="primary-btn" type="submit">Submit Report</button>
+</form>
+</article>
+</section>
+
+<section class="stats-grid">
+<div class="stat-card"><span>⚠</span><div><small>Total Reports</small><strong id="totalReports">0</strong></div></div>
+<div class="stat-card"><span>🔥</span><div><small>High/Critical</small><strong id="highReports">0</strong></div></div>
+<div class="stat-card"><span>👥</span><div><small>Most Reported Road</small><strong id="topRoad">—</strong></div></div>
+<div class="stat-card"><span>📊</span><div><small>Priority Score</small><strong id="priorityScore">0</strong></div></div>
+</section>
+
+<section class="panel">
+<div class="panel-header"><div><p class="eyebrow">ANALYTICS</p><h3>Road Maintenance Priority</h3></div><small class="muted">Demo score = usage + damage reports + severity</small></div>
+<div id="priorityTable" class="table-wrap"></div>
+</section>
+</main></div><div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+const seedIssues=[
+ {road:"MG Road",from:"Central",to:"Market",type:"Pothole",severity:"High",reports:8,usage:92},
+ {road:"Park Road",from:"Central",to:"Park",type:"Waterlogging",severity:"Medium",reports:5,usage:76},
+ {road:"Station Road",from:"Station",to:"Market",type:"Construction",severity:"High",reports:6,usage:81},
+ {road:"Ring Road",from:"North",to:"South",type:"Blocked Road",severity:"Critical",reports:10,usage:88},
+ {road:"Anna Salai",from:"Guindy",to:"Teynampet",type:"Damaged Road",severity:"Medium",reports:4,usage:95}
+];
+let reports=JSON.parse(localStorage.getItem("smartRoadReports")||"[]");
+
+function score(r){const s={Low:1,Medium:2,High:3,Critical:4}[r.severity]||1; return Math.round(r.usage*0.4+r.reports*4+s*10);}
+function allRows(){
+ const grouped=[...seedIssues];
+ reports.forEach(x=>{
+   const existing=grouped.find(g=>g.road.toLowerCase()===x.road.toLowerCase());
+   if(existing){existing.reports++;} else grouped.push({road:x.road,from:"Reported",to:"Reported",type:x.type,severity:x.severity,reports:1,usage:50});
+ });
+ return grouped.map(x=>({...x,score:score(x)})).sort((a,b)=>b.score-a.score);
+}
+let serverData=null;
+async function refreshServer(){try{serverData=await api("/road-priority")}catch(e){serverData=null}renderAnalytics();}
+function renderAnalytics(){
+ const rows=serverData?serverData.rows:allRows(), total=serverData?serverData.total:reports.length+seedIssues.reduce((a,b)=>a+b.reports,0);
+ document.getElementById("totalReports").textContent=total;
+ document.getElementById("highReports").textContent=serverData?serverData.high:seedIssues.filter(x=>["High","Critical"].includes(x.severity)).length+reports.filter(x=>["High","Critical"].includes(x.severity)).length;
+ document.getElementById("topRoad").textContent=rows[0]?.road||"—";
+ document.getElementById("priorityScore").textContent=rows[0]?.score||0;
+ document.getElementById("priorityTable").innerHTML=`<table><thead><tr><th>Road</th><th>Issue</th><th>Severity</th><th>Reports</th><th>Usage</th><th>Priority</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r.road}</b></td><td>${r.type}</td><td><span class="badge ${r.severity.toLowerCase()}">${r.severity}</span></td><td>${r.reports}</td><td>${r.usage}%</td><td><strong>${r.score}</strong></td></tr>`).join("")}</tbody></table>`;
+}
+document.getElementById("conditionForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const f=document.getElementById("fromArea").value.trim().toLowerCase(), t=document.getElementById("toArea").value.trim().toLowerCase();
+ let matches=seedIssues.filter(x=>(x.from+" "+x.road).toLowerCase().includes(f)||(x.to+" "+x.road).toLowerCase().includes(t)||(x.road.toLowerCase().includes(f)&&x.road.toLowerCase().includes(t)));
+ const box=document.getElementById("conditionResult");
+ try{matches=await api("/road-check?from="+encodeURIComponent(f)+"&to="+encodeURIComponent(t));}catch(_){}
+ if(matches.length) box.innerHTML=`<strong>Road issues found.</strong><br>${matches.map(x=>`<span class="badge ${x.severity.toLowerCase()}">${x.severity}</span> ${x.road}: ${x.type} (${x.reports} reports)`).join("<br>")}<br><small>Review the listed conditions before travelling.</small>`;
+ else box.innerHTML="<strong>No matching reported issue in this demo dataset.</strong><br>You can still report a road problem using the form.";
+});
+document.getElementById("reportForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const item={road:document.getElementById("reportRoad").value.trim(),type:document.getElementById("issueType").value,severity:document.getElementById("severity").value,description:document.getElementById("description").value,createdAt:new Date().toISOString()};
+ e.target.reset(); api("/road-issues","POST",{road:item.road,type:item.type,severity:item.severity,description:item.description}).then(()=>{refreshServer();showToast("Road issue reported successfully.");}).catch(()=>{reports.push(item);localStorage.setItem("smartRoadReports",JSON.stringify(reports));renderAnalytics();showToast("Server offline: saved on this device only.");});
+});
+refreshServer();
+</script>
+</body></html>

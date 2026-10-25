@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency Services - Smart Road</title><link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+<nav class="sidebar-nav">
+<a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+<a href="traffic.html" class="nav-item"><span>🚦</span>Traffic Management</a>
+<a href="road-condition.html" class="nav-item"><span>🛣</span>Road Condition</a>
+<a href="route-management.html" class="nav-item"><span>🗺</span>Route Management</a>
+<a href="accident-reporting.html" class="nav-item"><span>⚠</span>Accident Reporting</a>
+<a href="complaint-feedback.html" class="nav-item"><span>💬</span>Complaint &amp; Feedback</a>
+<a href="emergency-services.html" class="nav-item active"><span>🚑</span>Emergency Services</a>
+<a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+</nav></aside>
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Emergency Services</strong></header>
+<section class="page-hero"><p class="eyebrow">MODULE 7</p><h2>Emergency Services</h2><p>Quick access to police, ambulance, fire and rescue contacts.</p></section>
+<section class="panel"><div class="panel-header"><div><p class="eyebrow">HELPLINES</p><h3>Emergency Contacts</h3></div></div>
+<div id="emList" class="stats-grid"></div>
+<div class="route-note">In a life-threatening emergency call <b>112</b> immediately. Numbers shown are for India.</div>
+</section>
+</main></div><div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+(async()=>{
+ const box=document.getElementById('emList');
+ try{const rows=await api('/emergency');
+ box.innerHTML=rows.map(r=>`<div class="stat-card"><span>${esc(r.icon)}</span><div><small>${esc(r.name)}</small><strong><a href="tel:${esc(r.number)}">${esc(r.number)}</a></strong><small>${esc(r.description)}</small></div></div>`).join('');
+ }catch(e){box.innerHTML=`<div class="result-box">${esc(e.message)}</div>`}
+})();
+</script>
+</body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accident Reporting - Smart Road</title><link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+<nav class="sidebar-nav">
+<a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+<a href="traffic.html" class="nav-item"><span>🚦</span>Traffic Management</a>
+<a href="road-condition.html" class="nav-item"><span>🛣</span>Road Condition</a>
+<a href="route-management.html" class="nav-item"><span>🗺</span>Route Management</a>
+<a href="accident-reporting.html" class="nav-item active"><span>⚠</span>Accident Reporting</a>
+<a href="complaint-feedback.html" class="nav-item"><span>💬</span>Complaint &amp; Feedback</a>
+<a href="emergency-services.html" class="nav-item"><span>🚑</span>Emergency Services</a>
+<a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+</nav></aside>
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Accident Reporting</strong></header>
+<section class="page-hero"><p class="eyebrow">MODULE 5</p><h2>Accident Reporting</h2><p>Report road accidents and incidents so the concerned authorities can respond.</p></section>
+<section class="content-grid">
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">REPORT</p><h3>Report an Accident</h3></div></div>
+<form id="accForm" class="form-grid">
+<label>Location<input id="loc" required maxlength="200" placeholder="Road, landmark or area"></label>
+<label>Accident Type<select id="atype" required><option value="">Select type</option><option>Collision</option><option>Vehicle Skid / Overturned</option><option>Pedestrian Involved</option><option>Hit and Run</option><option>Breakdown Obstruction</option><option>Other</option></select></label>
+<label>Severity<select id="sev" required><option value="">Select severity</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></label>
+<label>Vehicles Involved<input id="veh" type="number" min="1" max="50" value="1"></label>
+<label>Injuries?<select id="inj"><option>No</option><option>Yes</option></select></label>
+<label>Description<textarea id="adesc" rows="3" required maxlength="1000" placeholder="What happened?"></textarea></label>
+<label>Contact Number (optional)<input id="aphone" maxlength="20" placeholder="For follow-up by authorities"></label>
+<button class="primary-btn" type="submit">Submit Report</button>
+</form>
+<div id="accResult" class="result-box muted">If someone is injured or in danger, call <b>112</b> or <b>108</b> first. This form does not replace an emergency call.</div>
+</article>
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">RECENT</p><h3>Recent Accident Reports</h3></div></div>
+<div id="accTable" class="table-wrap"></div>
+</article>
+</section>
+</main></div><div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+async function loadAcc(){
+ try{const rows=await api('/accidents');
+ document.getElementById('accTable').innerHTML=rows.length?`<table><thead><tr><th>Ref</th><th>Location</th><th>Type</th><th>Severity</th><th>Status</th><th>Time</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.reference)}</td><td><b>${esc(r.location)}</b></td><td>${esc(r.type)}</td><td><span class="badge ${esc(r.severity.toLowerCase())}">${esc(r.severity)}</span></td><td>${esc(r.status)}</td><td>${esc(when(r.created_at))}</td></tr>`).join('')}</tbody></table>`:'<div class="result-box muted">No accidents reported yet.</div>';
+ }catch(e){document.getElementById('accTable').innerHTML=`<div class="result-box">${esc(e.message)}</div>`}
+}
+document.getElementById('accForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ try{const r=await api('/accidents','POST',{location:val('loc'),type:val('atype'),severity:val('sev'),vehicles:val('veh'),injuries:val('inj'),description:val('adesc'),phone:val('aphone')});
+ document.getElementById('accResult').innerHTML=`<strong>Report submitted.</strong><br>Reference number: <b>${esc(r.reference)}</b>`;
+ e.target.reset();showToast('Accident reported successfully.');loadAcc();
+ }catch(err){document.getElementById('accResult').innerHTML=`<strong>Could not submit.</strong><br>${esc(err.message)}`}
+});
+loadAcc();
+</script>
+</body></html>
