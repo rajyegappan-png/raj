@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Road Management System - Home</title>
+    <link rel="stylesheet" href="modules.css">
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🛣️</div>
+                <div>
+                    <h1>Smart Road</h1>
+                    <span>Management System</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">
+                    <span class="nav-icon">⌂</span>
+                    <span>Home</span>
+                </a>
+
+                <a href="traffic.html" class="nav-item">
+                    <span class="nav-icon">🚦</span>
+                    <span>Traffic Management</span>
+                </a>
+
+                <a href="road-condition.html" class="nav-item">
+                    <span class="nav-icon">🛣</span>
+                    <span>Road Condition</span>
+                </a>
+
+                <a href="route-management.html" class="nav-item">
+                    <span class="nav-icon">🗺</span>
+                    <span>Route Management</span>
+                </a>
+
+                <a href="accident-reporting.html" class="nav-item">
+                    <span class="nav-icon">⚠</span>
+                    <span>Accident Reporting</span>
+                </a>
+
+                <a href="complaint-feedback.html" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span>Complaint & Feedback</span>
+                </a>
+
+                <a href="emergency-services.html" class="nav-item">
+                    <span class="nav-icon">🚑</span>
+                    <span>Emergency Services</span>
+                </a>
+
+                <a href="contact-us.html" class="nav-item">
+                    <span class="nav-icon">☎</span>
+                    <span>Contact Us</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Smart Roads • Safer Travel</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Mobile header -->
+            <header class="mobile-header">
+                <button id="menuBtn" class="menu-btn" aria-label="Open menu" onclick="toggleSidebar()">☰</button>
+                <strong>Smart Road Management</strong>
+            </header>
+
+            <!-- Welcome Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <span class="hero-label">SMART ROAD MANAGEMENT SYSTEM</span>
+                    <h2>Welcome to a Smarter Way to Travel</h2>
+                    <p>
+                        Monitor traffic, understand road conditions, find better routes,
+                        report incidents, and access essential road services from one place.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <button class="primary-btn" onclick="location.href='traffic.html'">
+                            View Traffic
+                        </button>
+                        <button class="secondary-btn" onclick="location.href='route-management.html'">
+                            Find a Route
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-road">
+                    <div class="city">
+                        <span class="building b1"></span>
+                        <span class="building b2"></span>
+                        <span class="building b3"></span>
+                        <span class="building b4"></span>
+                        <span class="building b5"></span>
+                    </div>
+                    <div class="road">
+                        <span class="lane lane1"></span>
+                        <span class="lane lane2"></span>
+                        <span class="car car1">🚗</span>
+                        <span class="car car2">🚙</span>
+                        <span class="car car3">🚕</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page Heading -->
+            <section class="section-heading">
+                <div>
+                    <p class="eyebrow">SYSTEM OVERVIEW</p>
+                    <h2>Road & Traffic Status</h2>
+                </div>
+                <span class="live"><i></i> System Online</span>
+            </section>
+
+            <!-- Overview Cards -->
+            <section class="overview-grid">
+
+                <article class="status-card traffic-card">
+                    <div class="card-top">
+                        <div class="card-icon">🚦</div>
+                        <span class="status-pill moderate">Moderate</span>
+                    </div>
+                    <h3>Traffic Status</h3>
+                    <p>Normal traffic flow across monitored roads.</p>
+                    <div class="card-number">Moderate</div>
+                    <div class="mini-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </article>
+
+                <article class="status-card">
+                    <div class="card-top">
+                        <div class="card-icon orange">!</div>
+                        <span class="status-pill warning">12 Issues</span>
+                    </div>
+                    <h3>Road Conditions</h3>
+                    <p>Potholes, construction and other issues reported.</p>
+                    <div class="card-number">12</div>
+                    <div class="mini-bars orange-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </article>
+
+                <article class="status-card">
+                    <div class="card-top">
+                        <div class="card-icon blue">⚠</div>
+                        <span class="status-pill info">Today</span>
+                    </div>
+                    <h3>Accidents</h3>
+                    <p>Reported road accidents requiring attention.</p>
+                    <div class="card-number">3</div>
+                    <div class="mini-bars blue-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </article>
+
+                <article class="status-card">
+                    <div class="card-top">
+                        <div class="card-icon purple">💬</div>
+                        <span class="status-pill purple-pill">Pending</span>
+                    </div>
+                    <h3>Complaints</h3>
+                    <p>User complaints waiting for review.</p>
+                    <div class="card-number">8</div>
+                    <div class="mini-bars purple-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- Main Dashboard Grid -->
+            <section class="dashboard-grid">
+
+                <!-- Road Snapshot -->
+                <article class="panel road-snapshot">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">ROAD MONITORING</p>
+                            <h2>Current Road Snapshot</h2>
+                        </div>
+                        <button class="text-btn" onclick="location.href='traffic.html'">View Details →</button>
+                    </div>
+
+                    <div class="road-map">
+                        <div class="map-grid"></div>
+
+                        <span class="road-line horizontal r1"></span>
+                        <span class="road-line horizontal r2"></span>
+                        <span class="road-line vertical r3"></span>
+                        <span class="road-line diagonal r4"></span>
+
+                        <span class="map-label label1">City Center</span>
+                        <span class="map-label label2">MG Road</span>
+                        <span class="map-label label3">Park Road</span>
+                        <span class="map-label label4">Market Street</span>
+
+                        <span class="map-pin pin-danger">⚠</span>
+                        <span class="map-pin pin-warning">!</span>
+                        <span class="map-pin pin-safe">●</span>
+
+                        <div class="map-legend">
+                            <span><i class="green"></i> Low Traffic</span>
+                            <span><i class="yellow"></i> Moderate</span>
+                            <span><i class="red"></i> Heavy Traffic</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Recent Issues -->
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">LATEST REPORTS</p>
+                            <h2>Recent Road Issues</h2>
+                        </div>
+                    </div>
+
+                    <div class="issue-list">
+                        <div class="issue">
+                            <span class="issue-icon danger">⚠</span>
+                            <div>
+                                <strong>Pothole</strong>
+                                <small>MG Road, City Center</small>
+                            </div>
+                            <time>09:30 AM</time>
+                        </div>
+
+                        <div class="issue">
+                            <span class="issue-icon warning">⚠</span>
+                            <div>
+                                <strong>Road Construction</strong>
+                                <small>Station Road</small>
+                            </div>
+                            <time>09:15 AM</time>
+                        </div>
+
+                        <div class="issue">
+                            <span class="issue-icon water">≈</span>
+                            <div>
+                                <strong>Water Logging</strong>
+                                <small>Park Road</small>
+                            </div>
+                            <time>08:45 AM</time>
+                        </div>
+
+                        <div class="issue">
+                            <span class="issue-icon blocked">⊘</span>
+                            <div>
+                                <strong>Road Blocked</strong>
+                                <small>Ring Road</small>
+                            </div>
+                            <time>Yesterday</time>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- Quick Access -->
+            <section class="section-heading quick-heading">
+                <div>
+                    <p class="eyebrow">QUICK ACCESS</p>
+                    <h2>Frequently Used Services</h2>
+                </div>
+            </section>
+
+            <section class="quick-grid">
+                <button class="quick-card" onclick="location.href='accident-reporting.html'">
+                    <span class="quick-icon red">⚠</span>
+                    <strong>Report Accident</strong>
+                    <small>Report a road accident</small>
+                </button>
+
+                <button class="quick-card" onclick="location.href='road-condition.html'">
+                    <span class="quick-icon yellow">!</span>
+                    <strong>Report Road Issue</strong>
+                    <small>Report potholes or damage</small>
+                </button>
+
+                <button class="quick-card" onclick="location.href='route-management.html'">
+                    <span class="quick-icon green">●</span>
+                    <strong>Find Best Route</strong>
+                    <small>Choose a suitable route</small>
+                </button>
+
+                <button class="quick-card" onclick="location.href='emergency-services.html'">
+                    <span class="quick-icon emergency">☎</span>
+                    <strong>Emergency Help</strong>
+                    <small>Access emergency services</small>
+                </button>
+            </section>
+
+            <!-- Updates -->
+            <section class="updates-panel panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">SYSTEM ACTIVITY</p>
+                        <h2>Important Updates</h2>
+                    </div>
+                    <button class="text-btn" id="updatesBtn">View All →</button>
+                </div>
+
+                <div class="updates-grid">
+                    <div class="update">
+                        <span class="update-icon success">✓</span>
+                        <div>
+                            <strong>System Update</strong>
+                            <p>All monitoring services are working normally.</p>
+                        </div>
+                        <small>2 min ago</small>
+                    </div>
+
+                    <div class="update">
+                        <span class="update-icon info">i</span>
+                        <div>
+                            <strong>Maintenance</strong>
+                            <p>Road maintenance activity reported on MG Road.</p>
+                        </div>
+                        <small>1 hour ago</small>
+                    </div>
+
+                    <div class="update">
+                        <span class="update-icon alert">!</span>
+                        <div>
+                            <strong>Traffic Alert</strong>
+                            <p>Heavy traffic detected near City Center.</p>
+                        </div>
+                        <small>2 hours ago</small>
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                <p>© 2026 Smart Road Management System</p>
+                <p>Smart Roads • Safer Travel • Better Cities</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast" role="status"></div>
+
+    <script src="modules.js"></script>
+    <script>document.getElementById("updatesBtn").addEventListener("click",()=>showToast("No more updates to show."));</script>
+</body>
+</html>

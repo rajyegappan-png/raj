@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Route Management - Smart Road</title><link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+<nav class="sidebar-nav">
+<a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+<a href="traffic.html" class="nav-item"><span>🚦</span>Traffic Management</a>
+<a href="road-condition.html" class="nav-item"><span>🛣</span>Road Condition</a>
+<a href="route-management.html" class="nav-item active"><span>🗺</span>Route Management</a>
+<a href="accident-reporting.html" class="nav-item"><span>⚠</span>Accident Reporting</a>
+<a href="complaint-feedback.html" class="nav-item"><span>💬</span>Complaint & Feedback</a>
+<a href="emergency-services.html" class="nav-item"><span>🚑</span>Emergency Services</a>
+<a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+</nav></aside>
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Route Management</strong></header>
+<section class="page-hero"><p class="eyebrow">MODULE 4</p><h2>Route Management</h2><p>Choose source and destination locations, calculate a route using Dijkstra's algorithm, and compare alternatives.</p></section>
+
+<section class="panel">
+<div class="panel-header"><div><p class="eyebrow">ROUTE SEARCH</p><h3>Find a Route</h3></div><span class="algorithm-tag">Dijkstra Algorithm</span></div>
+<form id="routeForm" class="route-form">
+<label>From State<select id="fromState"><option>Tamil Nadu</option><option>Kerala</option><option>Karnataka</option></select></label>
+<label>From District<select id="fromDistrict"></select></label>
+<label>From Area<select id="fromArea"></select></label>
+<label>To State<select id="toState"><option>Tamil Nadu</option><option>Kerala</option><option>Karnataka</option><option>Other State</option></select></label>
+<label>To District<select id="toDistrict"></select></label>
+<label>To Area<select id="toArea"></select></label>
+<button class="primary-btn" type="submit">Calculate Routes</button>
+</form>
+<div class="route-note">For an outside-Tamil-Nadu destination, select <b>Other State</b>, then choose the destination state and district.</div>
+</section>
+
+<section id="routeOutput" class="route-output hidden"></section>
+
+<section class="content-grid">
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">HOW IT WORKS</p><h3>Graph Model</h3></div></div>
+<div class="algorithm-box">
+<div><b>Nodes</b><span>Areas / intersections</span></div>
+<div><b>Edges</b><span>Road connections</span></div>
+<div><b>Weight</b><span>Distance + traffic + road condition</span></div>
+<div><b>Blocked road</b><span>Excluded from the graph</span></div>
+</div></article>
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">DEMO GRAPH</p><h3>Available Connections</h3></div></div><div id="graphList" class="connection-list"></div></article>
+</section>
+</main></div><div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+const locations={
+"Tamil Nadu":{Chennai:["Central","Guindy","T Nagar","OMR"],Coimbatore:["Gandhipuram","RS Puram","Airport"],Madurai:["Mattuthavani","KK Nagar","Periyar"],Salem:["Salem Central","Fairlands","Hasthampatti"],"Tiruchirappalli":["Central","Srirangam","Airport"]},
+"Kerala":{Ernakulam:["Kochi","Aluva"],Thiruvananthapuram:["Central","Kowdiar"]},
+"Karnataka":{Bengaluru:["Majestic","Electronic City","Whitefield"]},
+"Other State":{"Andhra Pradesh":["Tirupati","Vijayawada"],Telangana:["Hyderabad","Secunderabad"]}
+};
+
+const graph={
+"Central":[["Guindy",7],["T Nagar",5]],
+"Guindy":[["Central",7],["T Nagar",4],["OMR",10]],
+"T Nagar":[["Central",5],["Guindy",4],["OMR",8]],
+"OMR":[["Guindy",10],["T Nagar",8]],
+"Gandhipuram":[["RS Puram",4],["Airport",8]],
+"RS Puram":[["Gandhipuram",4],["Airport",6]],
+"Airport":[["Gandhipuram",8],["RS Puram",6]],
+"Mattuthavani":[["KK Nagar",5],["Periyar",7]],
+"KK Nagar":[["Mattuthavani",5],["Periyar",4]],
+"Periyar":[["Mattuthavani",7],["KK Nagar",4]],
+"Salem Central":[["Fairlands",4],["Hasthampatti",6]],
+"Fairlands":[["Salem Central",4],["Hasthampatti",3]],
+"Hasthampatti":[["Salem Central",6],["Fairlands",3]]
+};
+
+function fillDistricts(state, selectId){
+ const s=document.getElementById(selectId); s.innerHTML=Object.keys(locations[state]||{}).map(d=>`<option>${d}</option>`).join("");
+}
+function fillAreas(state,district,selectId){
+ const s=document.getElementById(selectId); s.innerHTML=(locations[state]?.[district]||[]).map(a=>`<option>${a}</option>`).join("");
+}
+function setupSelectors(){
+ fillDistricts(fromState.value,"fromDistrict"); fillAreas(fromState.value,fromDistrict.value,"fromArea");
+ fillDistricts(toState.value,"toDistrict"); fillAreas(toState.value,toDistrict.value,"toArea");
+}
+fromState.onchange=()=>{fillDistricts(fromState.value,"fromDistrict");fillAreas(fromState.value,fromDistrict.value,"fromArea")};
+fromDistrict.onchange=()=>fillAreas(fromState.value,fromDistrict.value,"fromArea");
+toState.onchange=()=>{fillDistricts(toState.value,"toDistrict");fillAreas(toState.value,toDistrict.value,"toArea")};
+toDistrict.onchange=()=>fillAreas(toState.value,toDistrict.value,"toArea");
+
+function dijkstra(start,end){
+ const dist={},prev={},visited=new Set(),nodes=Object.keys(graph);
+ nodes.forEach(n=>dist[n]=Infinity); dist[start]=0;
+ while(visited.size<nodes.length){
+  let u=null; nodes.forEach(n=>{if(!visited.has(n)&&(u===null||dist[n]<dist[u]))u=n});
+  if(u===null||dist[u]===Infinity)break; visited.add(u);
+  if(u===end)break;
+  graph[u].forEach(([v,w])=>{if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=u;}});
+ }
+ if(dist[end]===Infinity)return null;
+ const path=[];let cur=end;while(cur){path.unshift(cur);if(cur===start)break;cur=prev[cur];}
+ return {path,cost:dist[end]};
+}
+function renderGraph(){document.getElementById("graphList").innerHTML=Object.entries(graph).map(([a,edges])=>`<div><b>${a}</b><span>→ ${edges.map(e=>`${e[0]} (${e[1]})`).join(", ")}</span></div>`).join("");}
+function routeCard(title,result,condition){
+ if(!result)return `<div class="route-card"><h4>${title}</h4><p>No connected route in the current demo graph.</p></div>`;
+ return `<div class="route-card"><div><span class="route-label">${title}</span><span class="badge ${condition}">${condition==="recommended"?"Recommended":"Alternative"}</span></div><strong>${result.path.join(" → ")}</strong><p>Graph cost: ${result.cost} · Estimated distance: ${(result.cost*1.2).toFixed(1)} km · Estimated time: ${Math.max(8,Math.round(result.cost*2.1))} min</p></div>`;
+}
+document.getElementById("routeForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const start=fromArea.value,end=toArea.value;
+ let result=dijkstra(start,end), serverAlts=null;
+ try{const d=await api("/route","POST",{from:start,to:end});result=d.recommended;serverAlts=d.alternatives;}catch(_){}
+ const output=document.getElementById("routeOutput"); output.classList.remove("hidden");
+ if(result){
+  const alternatives=serverAlts||[...new Set(graph[start]?.map(x=>x[0])||[])].map(first=>dijkstra(first,end)).filter(Boolean).sort((a,b)=>a.cost-b.cost);
+  output.innerHTML=`<div class="panel"><div class="panel-header"><div><p class="eyebrow">ROUTE RESULTS</p><h3>${start} to ${end}</h3></div></div>${routeCard("Recommended Route",result,"recommended")}${alternatives.slice(0,2).map(r=>routeCard("Alternative Route",r,"alternative")).join("")}</div>`;
+ } else output.innerHTML=`<div class="panel result-box"><strong>No route found.</strong><br>This demo graph does not yet contain a connection between these areas. Database road-network integration will expand the graph.</div>`;
+});
+setupSelectors();renderGraph();
+</script>
+</body></html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Management - Smart Road</title>
+<link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+    <a href="traffic.html" class="nav-item active"><span>🚦</span>Traffic Management</a>
+    <a href="road-condition.html" class="nav-item"><span>🛣</span>Road Condition</a>
+    <a href="route-management.html" class="nav-item"><span>🗺</span>Route Management</a>
+    <a href="accident-reporting.html" class="nav-item"><span>⚠</span>Accident Reporting</a>
+    <a href="complaint-feedback.html" class="nav-item"><span>💬</span>Complaint & Feedback</a>
+    <a href="emergency-services.html" class="nav-item"><span>🚑</span>Emergency Services</a>
+    <a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+  </nav>
+</aside>
+
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Traffic Management</strong></header>
+
+<section class="page-hero">
+  <p class="eyebrow">MODULE 2</p>
+  <h2>Traffic Management</h2>
+  <p>Monitor traffic conditions, identify congested roads, and view traffic information for monitored locations.</p>
+</section>
+
+<section class="stats-grid">
+  <div class="stat-card"><span>🚦</span><div><small>Overall Status</small><strong id="overallStatus">Moderate</strong></div></div>
+  <div class="stat-card"><span>🛣</span><div><small>Monitored Roads</small><strong id="roadCount">8</strong></div></div>
+  <div class="stat-card"><span>⚠</span><div><small>Congested Roads</small><strong id="congestedCount">2</strong></div></div>
+  <div class="stat-card"><span>⏱</span><div><small>Avg. Delay</small><strong id="avgDelay">11 min</strong></div></div>
+</section>
+
+<section class="content-grid">
+<article class="panel">
+  <div class="panel-header"><div><p class="eyebrow">LIVE MONITORING</p><h3>Traffic Status by Road</h3></div><button class="outline-btn" onclick="refreshTraffic()">Refresh</button></div>
+  <div id="trafficTable" class="table-wrap"></div>
+</article>
+
+<article class="panel">
+  <div class="panel-header"><div><p class="eyebrow">SEARCH</p><h3>Check Traffic</h3></div></div>
+  <form id="trafficForm" class="form-grid">
+    <label>District<select id="district" required>
+      <option value="">Select district</option><option>Chennai</option><option>Coimbatore</option><option>Madurai</option><option>Salem</option><option>Tiruchirappalli</option></select></label>
+    <label>Area / Road<input id="area" placeholder="e.g. Anna Salai" required></label>
+    <label>Time<select id="time"><option>Now</option><option>Morning Peak</option><option>Evening Peak</option><option>Night</option></select></label>
+    <button class="primary-btn" type="submit">Check Traffic</button>
+  </form>
+  <div id="trafficResult" class="result-box muted">Select a district and road to view the traffic result.</div>
+</article>
+</section>
+
+<section class="panel">
+<div class="panel-header"><div><p class="eyebrow">TRAFFIC LEVELS</p><h3>How the system classifies traffic</h3></div></div>
+<div class="legend-grid">
+  <div><b class="dot low"></b><div><strong>Low</strong><small>Normal movement with little delay.</small></div></div>
+  <div><b class="dot moderate"></b><div><strong>Moderate</strong><small>Slower movement with manageable delay.</small></div></div>
+  <div><b class="dot heavy"></b><div><strong>Heavy</strong><small>High congestion and noticeable delay.</small></div></div>
+  <div><b class="dot blocked"></b><div><strong>Blocked</strong><small>Road movement is unavailable or severely restricted.</small></div></div>
+</div>
+</section>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+let trafficData = [
+ {road:"Anna Salai",district:"Chennai",level:"Heavy",speed:18,delay:17},
+ {road:"OMR",district:"Chennai",level:"Moderate",speed:34,delay:9},
+ {road:"Mount Road",district:"Chennai",level:"Heavy",speed:21,delay:14},
+ {road:"Avinashi Road",district:"Coimbatore",level:"Low",speed:48,delay:4},
+ {road:"Trichy Road",district:"Coimbatore",level:"Moderate",speed:31,delay:8},
+ {road:"KK Nagar Road",district:"Madurai",level:"Low",speed:45,delay:5},
+ {road:"Salem Bypass",district:"Salem",level:"Moderate",speed:36,delay:7},
+ {road:"Central Bus Stand Road",district:"Tiruchirappalli",level:"Low",speed:43,delay:4}
+];
+
+function renderTraffic(){
+  const html = `<table><thead><tr><th>Road</th><th>District</th><th>Status</th><th>Avg Speed</th><th>Delay</th></tr></thead><tbody>${
+    trafficData.map(r=>`<tr><td><b>${r.road}</b></td><td>${r.district}</td><td><span class="badge ${r.level.toLowerCase()}">${r.level}</span></td><td>${r.speed} km/h</td><td>${r.delay} min</td></tr>`).join("")
+  }</tbody></table>`;
+  document.getElementById("trafficTable").innerHTML=html;
+}
+async function refreshTraffic(){ try{ trafficData=await api("/traffic"); showToast("Traffic information refreshed."); }catch(e){ showToast("Server offline: showing saved data."); } renderTraffic(); }
+document.getElementById("trafficForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const district=document.getElementById("district").value;
+  const area=document.getElementById("area").value.trim();
+  const match=trafficData.find(r=>r.district===district && r.road.toLowerCase().includes(area.toLowerCase()));
+  const box=document.getElementById("trafficResult");
+  if(match) box.innerHTML=`<strong>${match.road}</strong><br><span class="badge ${match.level.toLowerCase()}">${match.level}</span> · Average speed ${match.speed} km/h · Estimated delay ${match.delay} minutes.`;
+  else box.innerHTML=`<strong>No exact monitored road found.</strong><br>For this demo, try a road shown in the monitoring table.`;
+});
+renderTraffic();
+api("/traffic").then(r=>{trafficData=r;renderTraffic();}).catch(()=>{});
+</script>
+</body>
+</html>

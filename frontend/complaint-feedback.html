@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint &amp; Feedback - Smart Road</title><link rel="stylesheet" href="modules.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon">🛣️</div><div><h1>Smart Road</h1><span>Management System</span></div></div>
+<nav class="sidebar-nav">
+<a href="index.html" class="nav-item"><span>⌂</span>Home</a>
+<a href="traffic.html" class="nav-item"><span>🚦</span>Traffic Management</a>
+<a href="road-condition.html" class="nav-item"><span>🛣</span>Road Condition</a>
+<a href="route-management.html" class="nav-item"><span>🗺</span>Route Management</a>
+<a href="accident-reporting.html" class="nav-item"><span>⚠</span>Accident Reporting</a>
+<a href="complaint-feedback.html" class="nav-item active"><span>💬</span>Complaint &amp; Feedback</a>
+<a href="emergency-services.html" class="nav-item"><span>🚑</span>Emergency Services</a>
+<a href="contact-us.html" class="nav-item"><span>☎</span>Contact Us</a>
+</nav></aside>
+<main class="main-content">
+<header class="mobile-header"><button class="menu-btn" onclick="toggleSidebar()">☰</button><strong>Complaint &amp; Feedback</strong></header>
+<section class="page-hero"><p class="eyebrow">MODULE 6</p><h2>Complaint &amp; Feedback</h2><p>Report road and traffic problems, track your complaint, and share suggestions.</p></section>
+<section class="content-grid">
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">COMPLAINT</p><h3>Submit a Complaint</h3></div></div>
+<form id="cmpForm" class="form-grid">
+<label>Your Name<input id="cname" required maxlength="100"></label>
+<label>Email<input id="cemail" type="email" required maxlength="120"></label>
+<label>Category<select id="ccat" required><option value="">Select category</option><option>Pothole</option><option>Damaged Road</option><option>Traffic Signal</option><option>Road Blockage</option><option>Other</option></select></label>
+<label>Location<input id="cloc" maxlength="200" placeholder="Road or area"></label>
+<label>Description<textarea id="cdesc" rows="3" required maxlength="1000"></textarea></label>
+<button class="primary-btn" type="submit">Submit Complaint</button>
+</form>
+<div id="cmpResult" class="result-box muted">You will receive a reference number to track your complaint.</div>
+</article>
+<article class="panel"><div class="panel-header"><div><p class="eyebrow">TRACK</p><h3>Track a Complaint</h3></div></div>
+<form id="trkForm" class="form-grid">
+<label>Reference Number<input id="tref" required placeholder="e.g. CMP-00001"></label>
+<button class="primary-btn" type="submit">Track</button>
+</form>
+<div id="trkResult" class="result-box muted">Enter your reference number to see the status.</div>
+</article>
+</section>
+<section class="panel"><div class="panel-header"><div><p class="eyebrow">FEEDBACK</p><h3>Share Your Suggestions</h3></div></div>
+<form id="fbForm" class="form-grid">
+<label>Rating<select id="frate" required><option value="">Select rating (5 is best)</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></label>
+<label>Suggestion / Feedback<textarea id="fmsg" rows="3" required maxlength="1000"></textarea></label>
+<button class="primary-btn" type="submit">Send Feedback</button>
+</form>
+</section>
+</main></div><div id="toast" class="toast"></div>
+<script src="modules.js"></script>
+<script src="api.js"></script>
+<script>
+const out=(id,h)=>document.getElementById(id).innerHTML=h;
+document.getElementById('cmpForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ try{const r=await api('/complaints','POST',{name:val('cname'),email:val('cemail'),category:val('ccat'),location:val('cloc'),description:val('cdesc')});
+ out('cmpResult',`<strong>Complaint submitted.</strong><br>Your reference number: <b>${esc(r.reference)}</b><br><small>Save it to track the status.</small>`);e.target.reset();showToast('Complaint submitted.');
+ }catch(err){out('cmpResult',`<strong>Could not submit.</strong><br>${esc(err.message)}`)}
+});
+document.getElementById('trkForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ try{const c=await api('/complaints/track/'+encodeURIComponent(val('tref').toUpperCase()));
+ out('trkResult',`<strong>Status: ${esc(c.status)}</strong><br>${esc(c.category)}${c.location?' · '+esc(c.location):''}<br><small>Submitted ${esc(when(c.created_at))}</small>`);
+ }catch(err){out('trkResult',`<strong>${esc(err.message)}</strong>`)}
+});
+document.getElementById('fbForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ try{await api('/feedback','POST',{rating:val('frate'),message:val('fmsg')});e.target.reset();showToast('Thank you for your feedback.');
+ }catch(err){showToast(err.message)}
+});
+</script>
+</body></html>
